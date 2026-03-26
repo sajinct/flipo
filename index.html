@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Flipo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Clock view -->
+  <div class="clock mode-view" id="clock-view">
+    <div class="flip-card" id="hours">
+      <div class="flip-card-inner">
+        <div class="card top" id="hours-top"><span>12</span></div>
+        <div class="card bottom" id="hours-bottom"><span>12</span><div class="period" id="period">AM</div></div>
+        <div class="shadow-top"></div>
+        <div class="card flip-top" id="hours-flip-top"><span>12</span></div>
+        <div class="card flip-bottom" id="hours-flip-bottom"><span>12</span><div class="period" id="period-flip">AM</div></div>
+      </div>
+    </div>
+    <div class="flip-card" id="minutes">
+      <div class="flip-card-inner">
+        <div class="card top" id="mins-top"><span>00</span></div>
+        <div class="card bottom" id="mins-bottom"><span>00</span></div>
+        <div class="shadow-top"></div>
+        <div class="card flip-top" id="mins-flip-top"><span>00</span></div>
+        <div class="card flip-bottom" id="mins-flip-bottom"><span>00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timer view -->
+  <div class="clock mode-view hidden" id="timer-view">
+    <div class="flip-card" id="t-minutes">
+      <div class="flip-card-inner">
+        <div class="card top" id="t-mins-top"><span>25</span><div class="timer-label session-label" id="session-label"></div></div>
+        <div class="card bottom" id="t-mins-bottom"><span>25</span><div class="timer-label task-label" id="task-label"></div></div>
+        <div class="shadow-top"></div>
+        <div class="card flip-top" id="t-mins-flip-top"><span>25</span><div class="timer-label session-label" id="session-label-flip"></div></div>
+        <div class="card flip-bottom" id="t-mins-flip-bottom"><span>25</span><div class="timer-label task-label" id="task-label-flip"></div></div>
+      </div>
+    </div>
+    <div class="flip-card" id="t-seconds">
+      <div class="flip-card-inner">
+        <div class="card top" id="t-secs-top"><span>00</span></div>
+        <div class="card bottom" id="t-secs-bottom"><span>00</span></div>
+        <div class="shadow-top"></div>
+        <div class="card flip-top" id="t-secs-flip-top"><span>00</span></div>
+        <div class="card flip-bottom" id="t-secs-flip-bottom"><span>00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile tap target -->
+  <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu"></button>
+
+  <!-- Bottom menu -->
+  <div class="menu-zone">
+    <div class="menu">
+      <div class="menu-section menu-left">
+        <button class="menu-btn active" data-mode="clock">Clock</button>
+      </div>
+      <div class="menu-section menu-center">
+        <button class="menu-btn" data-mode="focus">Focus</button>
+        <button class="menu-btn" data-mode="short">Short Break</button>
+        <button class="menu-btn" data-mode="long">Long Break</button>
+        <button class="menu-btn" data-action="reset">Reset</button>
+      </div>
+      <div class="menu-section menu-right">
+        <button class="menu-btn" data-action="dashboard">Dashboard</button>
+        <button class="menu-btn" data-action="settings">Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task input modal -->
+  <div class="overlay hidden" id="task-overlay">
+    <div class="modal task-modal">
+      <h2>What are you working on?</h2>
+      <input type="text" id="task-input" placeholder="e.g. Design homepage layout" maxlength="80" autocomplete="off">
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="task-skip">Skip</button>
+        <button class="btn btn-primary" id="task-start">Start Focus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="overlay hidden" id="settings-overlay">
+    <div class="modal settings-modal">
+      <h2>Timer Settings</h2>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label>Focus</label>
+          <div class="setting-control">
+            <button class="stepper-btn" data-target="focus-duration" data-step="-5">-</button>
+            <span class="setting-value" id="focus-duration">25</span>
+            <span class="setting-unit">min</span>
+            <button class="stepper-btn" data-target="focus-duration" data-step="5">+</button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label>Short Break</label>
+          <div class="setting-control">
+            <button class="stepper-btn" data-target="short-duration" data-step="-1">-</button>
+            <span class="setting-value" id="short-duration">5</span>
+            <span class="setting-unit">min</span>
+            <button class="stepper-btn" data-target="short-duration" data-step="1">+</button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label>Long Break</label>
+          <div class="setting-control">
+            <button class="stepper-btn" data-target="long-duration" data-step="-5">-</button>
+            <span class="setting-value" id="long-duration">15</span>
+            <span class="setting-unit">min</span>
+            <button class="stepper-btn" data-target="long-duration" data-step="5">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="settings-save">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard overlay -->
+  <div class="overlay hidden" id="dashboard-overlay">
+    <div class="dashboard">
+      <div class="dashboard-header">
+        <h2>Today's Sessions</h2>
+        <button class="btn btn-ghost" id="dashboard-close">Close</button>
+      </div>
+      <div class="dashboard-stats" id="dashboard-stats"></div>
+      <div class="dashboard-list" id="dashboard-list"></div>
+      <div class="dashboard-footer">
+        <button class="btn btn-ghost btn-danger" id="dashboard-clear">Clear History</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
