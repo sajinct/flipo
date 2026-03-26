@@ -159,24 +159,6 @@ body.menu-visible .menu {
   }
 }
 
-/* Color accents for timer modes */
-.menu-btn.active[data-mode="focus"] {
-  background: #2a1a1a;
-  border-color: #c0392b;
-  color: #e74c3c;
-}
-
-.menu-btn.active[data-mode="short"] {
-  background: #1a2a1a;
-  border-color: #27ae60;
-  color: #2ecc71;
-}
-
-.menu-btn.active[data-mode="long"] {
-  background: #1a1a2a;
-  border-color: #2980b9;
-  color: #3498db;
-}
 
 /* === TIMER LABELS (inside left card) === */
 .timer-label {
@@ -199,9 +181,6 @@ body.menu-visible .menu {
   color: #555;
 }
 
-.timer-label.session-label.focus { color: #e74c3c; }
-.timer-label.session-label.short { color: #2ecc71; }
-.timer-label.session-label.long { color: #3498db; }
 
 .timer-label.task-label {
   bottom: clamp(8px, 1.5vh, 24px);
