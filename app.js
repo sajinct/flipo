@@ -10,7 +10,33 @@ async function requestWakeLock() {
   } catch {}
 }
 
+// iOS fallback: silent video keeps screen awake
+function initNoSleep() {
+  const video = document.createElement('video');
+  video.setAttribute('playsinline', '');
+  video.setAttribute('muted', '');
+  video.setAttribute('loop', '');
+  video.style.position = 'fixed';
+  video.style.opacity = '0';
+  video.style.width = '1px';
+  video.style.height = '1px';
+  video.style.pointerEvents = 'none';
+  // Tiny inline base64 MP4 (silent, 1x1px, 1 second loop)
+  video.src = 'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAu1tZGF0AAACrQYF//+p3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE1MiByMjg1NCBlOWE1OTAzIC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAxNyAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTMgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4eDhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTMgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhPTAgYmZyYW1lcz0zIGJfcHlyYW1pZD0yIGJfYWRhcHQ9MSBiX2JpYXM9MCBkaXJlY3Q9MSB3ZWlnaHRiPTEgb3Blbl9nb3A9MCB3ZWlnaHRwPTIga2V5aW50PTI1MCBrZXlpbnRfbWluPTI1IHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAbWWIhAAz//727L4FNf2f0teleS2mvZiGBCnBkOhIl4iCAAADAADbBYIOBSAnMAABeAAFhISEAAAAA0BAAAAMA8YAAAaUBAAYogAAAAAUQ0MYAAANAMAAADAAADAA1MBGkAAAANkQAAAA==';
+  document.body.appendChild(video);
+
+  function playVideo() {
+    video.play().catch(() => {});
+  }
+
+  // iOS requires user gesture to start video
+  document.addEventListener('click', playVideo, { once: true });
+  document.addEventListener('touchstart', playVideo, { once: true });
+  playVideo();
+}
+
 requestWakeLock();
+initNoSleep();
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') requestWakeLock();
 });
