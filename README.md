@@ -2,6 +2,8 @@
 
 A minimal flip clock with a built-in Pomodoro timer. No dependencies, no build tools — just HTML, CSS, and JavaScript.
 
+**Live App:** [flipo.inzoft.com](https://flipo.inzoft.com/)
+
 ## Features
 
 - **Flip Clock** — 12-hour format with AM/PM, realistic 3D flip animation
@@ -15,11 +17,13 @@ A minimal flip clock with a built-in Pomodoro timer. No dependencies, no build t
 
 ## Getting Started
 
-Open `index.html` in any modern browser. No server required.
+Use the app directly at [flipo.inzoft.com](https://flipo.inzoft.com/) — installable as a full-screen PWA on any device.
+
+Or run it locally:
 
 ```
-git clone <repo-url>
-cd flipclock
+git clone https://github.com/sajinct/flipo.git
+cd flipo
 open index.html
 ```
 
