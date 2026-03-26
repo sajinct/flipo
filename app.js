@@ -542,6 +542,6 @@ document.querySelector('[data-action="settings"]').addEventListener('click', sho
 window.addEventListener('resize', sizeDigits);
 
 // === Start ===
-document.getElementById('version-tag').textContent = 'v' + APP_VERSION;
+document.getElementById('settings-version').textContent = 'Flipo v' + APP_VERSION;
 startClock();
 sizeDigits();
