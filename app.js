@@ -78,19 +78,39 @@ function sizeDigits() {
   const ratio = 3 / 4; // card width:height
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const pad = { x: vw * 0.05, y: vh * 0.06 };
-  const gap = Math.min(vw * 0.015, 24);
-  const availW = vw - pad.x * 2 - gap;
-  const availH = vh - pad.y * 2;
+  const portrait = vh > vw;
 
-  // Each card: fit 2 cards side by side within available space
-  let cardW = availW / 2;
-  let cardH = cardW / ratio;
+  let cardW, cardH;
 
-  // If too tall, constrain by height
-  if (cardH > availH) {
-    cardH = availH;
+  if (portrait) {
+    // Stacked vertically — 2 cards top/bottom
+    const pad = { x: vw * 0.03, y: vh * 0.02 };
+    const gap = Math.min(vh * 0.015, 24);
+    const availW = vw - pad.x * 2;
+    const availH = vh - pad.y * 2 - gap;
+
+    cardH = availH / 2;
     cardW = cardH * ratio;
+
+    // If too wide, constrain by width
+    if (cardW > availW) {
+      cardW = availW;
+      cardH = cardW / ratio;
+    }
+  } else {
+    // Side by side — 2 cards left/right
+    const pad = { x: vw * 0.03, y: vh * 0.02 };
+    const gap = Math.min(vw * 0.015, 24);
+    const availW = vw - pad.x * 2 - gap;
+    const availH = vh - pad.y * 2;
+
+    cardW = availW / 2;
+    cardH = cardW / ratio;
+
+    if (cardH > availH) {
+      cardH = availH;
+      cardW = cardH * ratio;
+    }
   }
 
   const root = document.documentElement;

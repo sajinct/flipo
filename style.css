@@ -214,6 +214,12 @@ body.menu-visible {
   color: #555;
 }
 
+.timer-label.task-right {
+  left: auto;
+  right: clamp(10px, 1.8vw, 28px);
+  text-align: right;
+}
+
 /* === VIEWS === */
 .mode-view {
   position: absolute;
@@ -230,8 +236,15 @@ body.menu-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3vh 2.5vw;
+  padding: 1vh 1.5vw;
   gap: clamp(8px, 1.5vw, 24px);
+}
+
+@media (orientation: portrait) {
+  .clock {
+    flex-direction: column;
+    gap: clamp(8px, 1.5vh, 24px);
+  }
 }
 
 /* === FLIP CARDS === */

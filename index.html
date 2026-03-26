@@ -8,6 +8,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body>
 
@@ -38,19 +42,19 @@
     <div class="flip-card" id="t-minutes">
       <div class="flip-card-inner">
         <div class="card top" id="t-mins-top"><span>25</span><div class="timer-label session-label" id="session-label"></div></div>
-        <div class="card bottom" id="t-mins-bottom"><span>25</span><div class="timer-label task-label" id="task-label"></div></div>
+        <div class="card bottom" id="t-mins-bottom"><span>25</span></div>
         <div class="shadow-top"></div>
         <div class="card flip-top" id="t-mins-flip-top"><span>25</span><div class="timer-label session-label" id="session-label-flip"></div></div>
-        <div class="card flip-bottom" id="t-mins-flip-bottom"><span>25</span><div class="timer-label task-label" id="task-label-flip"></div></div>
+        <div class="card flip-bottom" id="t-mins-flip-bottom"><span>25</span></div>
       </div>
     </div>
     <div class="flip-card" id="t-seconds">
       <div class="flip-card-inner">
         <div class="card top" id="t-secs-top"><span>00</span></div>
-        <div class="card bottom" id="t-secs-bottom"><span>00</span></div>
+        <div class="card bottom" id="t-secs-bottom"><span>00</span><div class="timer-label task-label task-right" id="task-label"></div></div>
         <div class="shadow-top"></div>
         <div class="card flip-top" id="t-secs-flip-top"><span>00</span></div>
-        <div class="card flip-bottom" id="t-secs-flip-bottom"><span>00</span></div>
+        <div class="card flip-bottom" id="t-secs-flip-bottom"><span>00</span><div class="timer-label task-label task-right" id="task-label-flip"></div></div>
       </div>
     </div>
   </div>
@@ -144,5 +148,10 @@
   </div>
 
   <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
 </body>
 </html>
