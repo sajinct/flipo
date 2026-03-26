@@ -109,6 +109,16 @@ body.menu-visible .menu {
   white-space: nowrap;
 }
 
+.version-tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  color: #444;
+  letter-spacing: 0.5px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
 .menu-btn:hover {
   color: #ccc;
   border-color: #666;

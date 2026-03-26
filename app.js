@@ -1,3 +1,5 @@
+const APP_VERSION = '1.1.0';
+
 // === Wake Lock (prevent screen sleep) ===
 let wakeLock = null;
 
@@ -540,5 +542,6 @@ document.querySelector('[data-action="settings"]').addEventListener('click', sho
 window.addEventListener('resize', sizeDigits);
 
 // === Start ===
+document.getElementById('version-tag').textContent = 'v' + APP_VERSION;
 startClock();
 sizeDigits();
