@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html>
-<head><title>Generate Icons</title></head>
+<head>
+<title>Generate Icons</title>
+<style>
+  body { font-family: sans-serif; background: #1a1a1a; color: #ccc; padding: 20px; }
+  canvas, img { display: block; margin: 10px 0; border: 1px solid #333; }
+  h3 { margin-top: 24px; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
+</head>
 <body>
 <p>Right-click each image below and "Save image as" to the icons/ folder:</p>
 <h3>icon-192.png</h3>
@@ -11,65 +19,232 @@
 function drawIcon(canvas) {
   const s = canvas.width;
   const ctx = canvas.getContext('2d');
+  const f = s / 512; // scale factor from 512 base
 
-  // Background
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, s, s);
+  // Clear with transparent then fill black
+  ctx.clearRect(0, 0, s, s);
 
-  const pad = s * 0.047;
-  const gap = s * 0.047;
-  const cw = (s - pad * 2 - gap) / 2;
-  const ch = s - pad * 2;
-  const cr = s * 0.055;
-  const midY = pad + ch / 2;
+  // --- Cube geometry (base 512, scaled by f) ---
+  const top    = [256*f, 48*f];
+  const left   = [86*f, 148*f];
+  const right  = [426*f, 148*f];
+  const center = [256*f, 248*f];
+  const botL   = [86*f, 348*f];
+  const botR   = [426*f, 348*f];
+  const bottom = [256*f, 448*f];
 
-  // Left card
-  ctx.fillStyle = '#2b2b2b';
-  ctx.beginPath();
-  ctx.roundRect(pad, pad, cw, ch, cr);
-  ctx.fill();
-  ctx.fillStyle = '#242424';
-  ctx.beginPath();
-  ctx.roundRect(pad, midY, cw, ch / 2, [0, 0, cr, cr]);
-  ctx.fill();
+  // Drop shadow
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 14 * f;
+  ctx.shadowOffsetY = 14 * f;
 
-  // Right card
-  ctx.fillStyle = '#2b2b2b';
+  // --- TOP FACE ---
+  const topGrad = ctx.createLinearGradient(left[0], top[1], right[0], center[1]);
+  topGrad.addColorStop(0, '#3d3d3d');
+  topGrad.addColorStop(1, '#2e2e2e');
+  ctx.fillStyle = topGrad;
   ctx.beginPath();
-  ctx.roundRect(pad + cw + gap, pad, cw, ch, cr);
-  ctx.fill();
-  ctx.fillStyle = '#242424';
-  ctx.beginPath();
-  ctx.roundRect(pad + cw + gap, midY, cw, ch / 2, [0, 0, cr, cr]);
+  ctx.moveTo(...top); ctx.lineTo(...right); ctx.lineTo(...center); ctx.lineTo(...left);
+  ctx.closePath();
   ctx.fill();
 
-  // Divider lines
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth = s * 0.006;
+  // --- LEFT FACE ---
+  const leftGrad = ctx.createLinearGradient(left[0], left[1], center[0], bottom[1]);
+  leftGrad.addColorStop(0, '#282828');
+  leftGrad.addColorStop(1, '#1a1a1a');
+  ctx.fillStyle = leftGrad;
   ctx.beginPath();
-  ctx.moveTo(pad, midY);
-  ctx.lineTo(pad + cw, midY);
-  ctx.moveTo(pad + cw + gap, midY);
-  ctx.lineTo(pad + cw + gap + cw, midY);
+  ctx.moveTo(...left); ctx.lineTo(...center); ctx.lineTo(...bottom); ctx.lineTo(...botL);
+  ctx.closePath();
+  ctx.fill();
+
+  // --- RIGHT FACE ---
+  const rightGrad = ctx.createLinearGradient(right[0], right[1], center[0], bottom[1]);
+  rightGrad.addColorStop(0, '#242424');
+  rightGrad.addColorStop(1, '#151515');
+  ctx.fillStyle = rightGrad;
+  ctx.beginPath();
+  ctx.moveTo(...center); ctx.lineTo(...right); ctx.lineTo(...botR); ctx.lineTo(...bottom);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore(); // remove shadow for details
+
+  // --- TOP FACE EDGE HIGHLIGHTS ---
+  ctx.strokeStyle = 'rgba(80,80,80,0.45)';
+  ctx.lineWidth = 0.7 * f;
+  ctx.beginPath();
+  ctx.moveTo(...left); ctx.lineTo(...top);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(72,72,72,0.45)';
+  ctx.beginPath();
+  ctx.moveTo(...top); ctx.lineTo(...right);
   ctx.stroke();
 
-  // Digits
-  ctx.fillStyle = '#aaa';
-  ctx.font = `700 ${s * 0.82}px Oswald, Arial, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillText('0', pad + cw / 2, s * 0.8);
-  ctx.fillText('0', pad + cw + gap + cw / 2, s * 0.8);
+  // --- CLOCK ICON ON TOP FACE ---
+  ctx.save();
+  ctx.translate(256*f, 148*f);
+  ctx.scale(1, 0.588);
+  const r = 97 * f;
+
+  // Clock circle
+  ctx.strokeStyle = 'rgba(136,136,136,0.75)';
+  ctx.lineWidth = 3 * f;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Hour hand
+  ctx.strokeStyle = 'rgba(170,170,170,0.85)';
+  ctx.lineWidth = 4 * f;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(0, 0); ctx.lineTo(0, -51*f);
+  ctx.stroke();
+
+  // Minute hand
+  ctx.lineWidth = 2.8 * f;
+  ctx.beginPath();
+  ctx.moveTo(0, 0); ctx.lineTo(36*f, -36*f);
+  ctx.stroke();
+
+  // Center dot
+  ctx.fillStyle = 'rgba(170,170,170,0.85)';
+  ctx.beginPath();
+  ctx.arc(0, 0, 5.5*f, 0, Math.PI*2);
+  ctx.fill();
+
+  // Cardinal markers
+  ctx.fillStyle = 'rgba(102,102,102,0.7)';
+  [[0,-86],[86,0],[0,86],[-86,0]].forEach(([x,y]) => {
+    ctx.beginPath(); ctx.arc(x*f, y*f, 3.5*f, 0, Math.PI*2); ctx.fill();
+  });
+
+  // Minor markers
+  ctx.fillStyle = 'rgba(85,85,85,0.5)';
+  [[43,-74.5],[74.5,-43],[74.5,43],[43,74.5],[-43,74.5],[-74.5,43],[-74.5,-43],[-43,-74.5]].forEach(([x,y]) => {
+    ctx.beginPath(); ctx.arc(x*f, y*f, 2*f, 0, Math.PI*2); ctx.fill();
+  });
+
+  ctx.restore();
+
+  // --- Helper: draw face content (cards + split digit + hinge) ---
+  // Uses canvas transform to map 170x200 local coords onto isometric face
+  function drawFaceContent(matA, matB, matC, matD, matE, matF, topFill1, topFill2, botFill1, botFill2, digit, fontSize) {
+    ctx.save();
+    // Apply the isometric matrix transform
+    ctx.transform(matA*f, matB*f, matC*f, matD*f, matE*f, matF*f);
+
+    const cX = 8, cY = 8, cW = 154, cH = 88, cR = 6;
+    const bY = 104;
+
+    // Top card panel
+    const tg = ctx.createLinearGradient(0, cY, 0, cY + cH);
+    tg.addColorStop(0, topFill1); tg.addColorStop(1, topFill2);
+    ctx.fillStyle = tg;
+    ctx.beginPath(); ctx.roundRect(cX, cY, cW, cH, cR); ctx.fill();
+
+    // Bottom card panel
+    const bg = ctx.createLinearGradient(0, bY, 0, bY + cH);
+    bg.addColorStop(0, botFill1); bg.addColorStop(1, botFill2);
+    ctx.fillStyle = bg;
+    ctx.beginPath(); ctx.roundRect(cX, bY, cW, cH, cR); ctx.fill();
+
+    // Draw digit on top card (clipped)
+    ctx.save();
+    ctx.beginPath(); ctx.roundRect(cX, cY, cW, cH, cR); ctx.clip();
+    ctx.fillStyle = '#c0c0c0';
+    ctx.font = `700 ${fontSize}px Oswald, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(digit, 85, 100);
+    ctx.restore();
+
+    // Draw digit on bottom card (clipped)
+    ctx.save();
+    ctx.beginPath(); ctx.roundRect(cX, bY, cW, cH, cR); ctx.clip();
+    ctx.fillStyle = '#a0a0a0';
+    ctx.font = `700 ${fontSize}px Oswald, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(digit, 85, 100);
+    ctx.restore();
+
+    // Hinge — dark gap
+    ctx.fillStyle = '#050505';
+    ctx.fillRect(cX, 97, cW, 6);
+
+    // Hinge highlight on top card bottom edge
+    ctx.strokeStyle = 'rgba(58,58,58,0.3)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(cX, 96.5); ctx.lineTo(cX + cW, 96.5); ctx.stroke();
+
+    // Hinge highlight on bottom card top edge
+    ctx.strokeStyle = 'rgba(51,51,51,0.45)';
+    ctx.lineWidth = 0.6;
+    ctx.beginPath(); ctx.moveTo(cX, 103.5); ctx.lineTo(cX + cW, 103.5); ctx.stroke();
+
+    // Hinge shadow below
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(cX, 105); ctx.lineTo(cX + cW, 105); ctx.stroke();
+
+    // Pivot nubs
+    ctx.fillStyle = '#111';
+    ctx.strokeStyle = '#252525';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.arc(7, 100, 2.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(163, 100, 2.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // LEFT FACE: matrix(1, 0.5882, 0, 1, 86, 148)
+  drawFaceContent(1, 0.5882, 0, 1, 86, 148,
+    '#2f2f2f', '#272727', '#222222', '#1b1b1b',
+    '25', 108);
+
+  // RIGHT FACE: matrix(1, -0.5882, 0, 1, 256, 248)
+  drawFaceContent(1, -0.5882, 0, 1, 256, 248,
+    '#2a2a2a', '#232323', '#1e1e1e', '#171717',
+    '5', 118);
+
+  // --- EDGE LINES ---
+  // Center vertical
+  ctx.strokeStyle = '#0e0e0e';
+  ctx.lineWidth = 1.2 * f;
+  ctx.beginPath(); ctx.moveTo(256*f, 248*f); ctx.lineTo(256*f, 448*f); ctx.stroke();
+
+  // Left vertical
+  ctx.strokeStyle = 'rgba(53,53,53,0.35)';
+  ctx.lineWidth = 0.6 * f;
+  ctx.beginPath(); ctx.moveTo(86*f, 148*f); ctx.lineTo(86*f, 348*f); ctx.stroke();
+
+  // Right vertical
+  ctx.strokeStyle = 'rgba(30,30,30,0.3)';
+  ctx.beginPath(); ctx.moveTo(426*f, 148*f); ctx.lineTo(426*f, 348*f); ctx.stroke();
+
+  // Bottom edges
+  ctx.strokeStyle = 'rgba(12,12,12,0.5)';
+  ctx.lineWidth = 1 * f;
+  ctx.beginPath(); ctx.moveTo(86*f, 348*f); ctx.lineTo(256*f, 448*f); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(256*f, 448*f); ctx.lineTo(426*f, 348*f); ctx.stroke();
 }
 
-drawIcon(document.getElementById('c192'));
-drawIcon(document.getElementById('c512'));
+// Wait for Oswald font to load before drawing
+document.fonts.ready.then(() => {
+  drawIcon(document.getElementById('c192'));
+  drawIcon(document.getElementById('c512'));
 
-[192, 512].forEach(size => {
-  const canvas = document.getElementById('c' + size);
-  const img = new Image();
-  img.src = canvas.toDataURL('image/png');
-  canvas.parentNode.insertBefore(img, canvas.nextSibling);
+  // Show as downloadable images
+  [192, 512].forEach(size => {
+    const canvas = document.getElementById('c' + size);
+    const img = new Image();
+    img.src = canvas.toDataURL('image/png');
+    img.style.border = '1px solid #333';
+    canvas.parentNode.insertBefore(img, canvas.nextSibling);
+  });
 });
 </script>
 </body>

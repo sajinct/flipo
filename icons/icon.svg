@@ -1,19 +1,181 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#000"/>
-  <!-- Left card top -->
-  <rect x="24" y="24" width="220" height="224" rx="28" ry="28" fill="#2b2b2b"/>
-  <rect x="24" y="248" width="220" height="0" fill="#2b2b2b"/>
-  <!-- Left card bottom -->
-  <rect x="24" y="252" width="220" height="236" rx="28" ry="28" fill="#242424"/>
-  <rect x="24" y="252" width="220" height="0" fill="#242424"/>
-  <!-- Right card top -->
-  <rect x="268" y="24" width="220" height="224" rx="28" ry="28" fill="#2b2b2b"/>
-  <!-- Right card bottom -->
-  <rect x="268" y="252" width="220" height="236" rx="28" ry="28" fill="#242424"/>
-  <!-- Divider lines -->
-  <rect x="24" y="246" width="220" height="4" fill="#000"/>
-  <rect x="268" y="246" width="220" height="4" fill="#000"/>
-  <!-- Digits - tall, filling the card height -->
-  <text x="134" y="410" text-anchor="middle" font-family="Oswald, Arial, sans-serif" font-size="420" font-weight="700" fill="#aaa">0</text>
-  <text x="378" y="410" text-anchor="middle" font-family="Oswald, Arial, sans-serif" font-size="420" font-weight="700" fill="#aaa">0</text>
+  <defs>
+    <!-- Face gradients -->
+    <linearGradient id="gTop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3d3d3d"/>
+      <stop offset="100%" stop-color="#2e2e2e"/>
+    </linearGradient>
+    <linearGradient id="gLeft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#282828"/>
+      <stop offset="100%" stop-color="#1a1a1a"/>
+    </linearGradient>
+    <linearGradient id="gRight" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#242424"/>
+      <stop offset="100%" stop-color="#151515"/>
+    </linearGradient>
+
+    <!-- Flip card gradients (left face) -->
+    <linearGradient id="lcT" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2f2f2f"/>
+      <stop offset="100%" stop-color="#272727"/>
+    </linearGradient>
+    <linearGradient id="lcB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#222222"/>
+      <stop offset="100%" stop-color="#1b1b1b"/>
+    </linearGradient>
+
+    <!-- Flip card gradients (right face) -->
+    <linearGradient id="rcT" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a2a2a"/>
+      <stop offset="100%" stop-color="#232323"/>
+    </linearGradient>
+    <linearGradient id="rcB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1e1e"/>
+      <stop offset="100%" stop-color="#171717"/>
+    </linearGradient>
+
+    <!-- Drop shadow -->
+    <filter id="shadow" x="-25%" y="-10%" width="150%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14" result="blur"/>
+      <feOffset in="blur" dx="0" dy="14" result="off"/>
+      <feFlood flood-color="#000" flood-opacity="0.5" result="color"/>
+      <feComposite in="color" in2="off" operator="in" result="sh"/>
+      <feMerge>
+        <feMergeNode in="sh"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!--
+      CUBE GEOMETRY:
+        Top: (256,48)  Left: (86,148)  Right: (426,148)
+        Center: (256,248)  BotL: (86,348)  BotR: (426,348)  Bottom: (256,448)
+
+      LOCAL COORDS: each face is 170×200
+      LEFT FACE:  matrix(1, 0.5882, 0, 1, 86, 148)
+      RIGHT FACE: matrix(1, -0.5882, 0, 1, 256, 248)
+    -->
+
+    <!-- Clip paths for flip card split — match card panel rects exactly -->
+    <!-- Top card clip: x=8 y=8 w=154 h=88 (card area only) -->
+    <clipPath id="cardTopClip">
+      <rect x="8" y="8" width="154" height="88" rx="6" ry="6"/>
+    </clipPath>
+    <!-- Bottom card clip: x=8 y=104 w=154 h=88 (card area only) -->
+    <clipPath id="cardBotClip">
+      <rect x="8" y="104" width="154" height="88" rx="6" ry="6"/>
+    </clipPath>
+  </defs>
+
+  <g filter="url(#shadow)">
+
+    <!-- ════════ TOP FACE ════════ -->
+    <polygon points="256,48 426,148 256,248 86,148" fill="url(#gTop)"/>
+    <line x1="86" y1="148" x2="256" y2="48" stroke="#505050" stroke-width="0.7" opacity="0.45"/>
+    <line x1="256" y1="48" x2="426" y2="148" stroke="#484848" stroke-width="0.7" opacity="0.45"/>
+
+    <!-- Clock icon centered on top face -->
+    <g transform="translate(256,148) scale(1,0.588)">
+      <circle cx="0" cy="0" r="97" fill="none" stroke="#888" stroke-width="3" opacity="0.75"/>
+      <line x1="0" y1="0" x2="0" y2="-51" stroke="#aaa" stroke-width="4" stroke-linecap="round" opacity="0.85"/>
+      <line x1="0" y1="0" x2="36" y2="-36" stroke="#aaa" stroke-width="2.8" stroke-linecap="round" opacity="0.85"/>
+      <circle cx="0" cy="0" r="5.5" fill="#aaa" opacity="0.85"/>
+      <circle cx="0" cy="-86" r="3.5" fill="#666" opacity="0.7"/>
+      <circle cx="86" cy="0" r="3.5" fill="#666" opacity="0.7"/>
+      <circle cx="0" cy="86" r="3.5" fill="#666" opacity="0.7"/>
+      <circle cx="-86" cy="0" r="3.5" fill="#666" opacity="0.7"/>
+      <circle cx="43" cy="-74.5" r="2" fill="#555" opacity="0.5"/>
+      <circle cx="74.5" cy="-43" r="2" fill="#555" opacity="0.5"/>
+      <circle cx="74.5" cy="43" r="2" fill="#555" opacity="0.5"/>
+      <circle cx="43" cy="74.5" r="2" fill="#555" opacity="0.5"/>
+      <circle cx="-43" cy="74.5" r="2" fill="#555" opacity="0.5"/>
+      <circle cx="-74.5" cy="43" r="2" fill="#555" opacity="0.5"/>
+      <circle cx="-74.5" cy="-43" r="2" fill="#555" opacity="0.5"/>
+      <circle cx="-43" cy="-74.5" r="2" fill="#555" opacity="0.5"/>
+    </g>
+
+    <!-- ════════ LEFT FACE ════════ -->
+    <polygon points="86,148 256,248 256,448 86,348" fill="url(#gLeft)"/>
+
+    <!-- Left face content in 170×200 local coords -->
+    <g transform="matrix(1, 0.5882, 0, 1, 86, 148)">
+      <!-- Top card panel -->
+      <rect x="8" y="8" width="154" height="88" rx="6" ry="6" fill="url(#lcT)"/>
+      <!-- Bottom card panel -->
+      <rect x="8" y="104" width="154" height="88" rx="6" ry="6" fill="url(#lcB)"/>
+
+      <!-- Top half of "25" — clipped to top card area -->
+      <g clip-path="url(#cardTopClip)">
+        <text x="85" y="100"
+              text-anchor="middle"
+              dominant-baseline="central"
+              font-family="Oswald, sans-serif"
+              font-weight="700"
+              font-size="108"
+              fill="#c0c0c0"
+              letter-spacing="-3">25</text>
+      </g>
+
+      <!-- Bottom half of "25" — clipped to bottom card area -->
+      <g clip-path="url(#cardBotClip)">
+        <text x="85" y="100"
+              text-anchor="middle"
+              dominant-baseline="central"
+              font-family="Oswald, sans-serif"
+              font-weight="700"
+              font-size="108"
+              fill="#a0a0a0"
+              letter-spacing="-3">25</text>
+      </g>
+
+      <!-- Hinge divider — constrained to card width only -->
+      <line x1="8" y1="100" x2="162" y2="100" stroke="#080808" stroke-width="3.5"/>
+      <line x1="8" y1="98" x2="162" y2="98" stroke="#3a3a3a" stroke-width="0.6" opacity="0.25"/>
+    </g>
+
+    <!-- ════════ RIGHT FACE ════════ -->
+    <polygon points="256,248 426,148 426,348 256,448" fill="url(#gRight)"/>
+
+    <!-- Right face content in 170×200 local coords -->
+    <g transform="matrix(1, -0.5882, 0, 1, 256, 248)">
+      <!-- Top card panel -->
+      <rect x="8" y="8" width="154" height="88" rx="6" ry="6" fill="url(#rcT)"/>
+      <!-- Bottom card panel -->
+      <rect x="8" y="104" width="154" height="88" rx="6" ry="6" fill="url(#rcB)"/>
+
+      <!-- Top half of "5" — clipped to top card area -->
+      <g clip-path="url(#cardTopClip)">
+        <text x="85" y="100"
+              text-anchor="middle"
+              dominant-baseline="central"
+              font-family="Oswald, sans-serif"
+              font-weight="700"
+              font-size="118"
+              fill="#c0c0c0">5</text>
+      </g>
+
+      <!-- Bottom half of "5" — clipped to bottom card area -->
+      <g clip-path="url(#cardBotClip)">
+        <text x="85" y="100"
+              text-anchor="middle"
+              dominant-baseline="central"
+              font-family="Oswald, sans-serif"
+              font-weight="700"
+              font-size="118"
+              fill="#a0a0a0">5</text>
+      </g>
+
+      <!-- Hinge divider — constrained to card width only -->
+      <line x1="8" y1="100" x2="162" y2="100" stroke="#080808" stroke-width="3.5"/>
+      <line x1="8" y1="98" x2="162" y2="98" stroke="#3a3a3a" stroke-width="0.6" opacity="0.25"/>
+    </g>
+
+    <!-- ════════ EDGE LINES ════════ -->
+    <line x1="256" y1="248" x2="256" y2="448" stroke="#0e0e0e" stroke-width="1.2"/>
+    <line x1="86" y1="148" x2="86" y2="348" stroke="#353535" stroke-width="0.6" opacity="0.35"/>
+    <line x1="426" y1="148" x2="426" y2="348" stroke="#1e1e1e" stroke-width="0.6" opacity="0.3"/>
+    <line x1="86" y1="348" x2="256" y2="448" stroke="#0c0c0c" stroke-width="1" opacity="0.5"/>
+    <line x1="256" y1="448" x2="426" y2="348" stroke="#0c0c0c" stroke-width="1" opacity="0.5"/>
+
+  </g>
 </svg>
