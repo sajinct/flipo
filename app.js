@@ -31,23 +31,50 @@ function checkForUpdate() {
 }
 
 // === Idle UI: hide cursor + menu after 3s of inactivity ===
+const menuZone = document.querySelector('.menu-zone');
 let idleTimer = null;
 
-function onActivity() {
+function showUI() {
   document.body.classList.remove('idle');
   document.body.classList.add('menu-visible');
   clearTimeout(idleTimer);
-  idleTimer = setTimeout(() => {
-    document.body.classList.add('idle');
-    document.body.classList.remove('menu-visible');
-  }, 3000);
+  idleTimer = setTimeout(hideUI, 3000);
 }
 
-document.addEventListener('mousemove', onActivity);
-document.addEventListener('mousedown', onActivity);
-document.addEventListener('touchstart', onActivity);
-document.addEventListener('click', onActivity);
-onActivity();
+function hideUI() {
+  clearTimeout(idleTimer);
+  document.body.classList.add('idle');
+  document.body.classList.remove('menu-visible');
+}
+
+// Detect touch device — suppress mousemove on touch
+let isTouch = false;
+
+document.addEventListener('touchstart', () => { isTouch = true; }, { once: true });
+
+// mousemove shows UI (desktop only)
+document.addEventListener('mousemove', () => {
+  if (isTouch) return;
+  showUI();
+});
+
+// Tap/click toggles menu
+function handleTap(e) {
+  if (menuZone.contains(e.target)) return; // let menu buttons work normally
+  if (document.body.classList.contains('menu-visible')) {
+    hideUI();
+  } else {
+    showUI();
+  }
+}
+
+document.addEventListener('touchstart', handleTap);
+document.addEventListener('click', (e) => {
+  if (isTouch) return; // already handled by touchstart
+  handleTap(e);
+});
+
+showUI();
 
 // === Wake Lock (prevent screen sleep) ===
 let wakeLock = null;
@@ -567,15 +594,15 @@ document.querySelectorAll('.overlay').forEach(overlay => {
 });
 
 // === Menu ===
-const menuZone = document.querySelector('.menu-zone');
 
-// Keep UI active while hovering over menu
+// Keep menu open while hovering over it
 menuZone.addEventListener('mouseenter', () => {
   clearTimeout(idleTimer);
   document.body.classList.remove('idle');
   document.body.classList.add('menu-visible');
 });
-menuZone.addEventListener('mouseleave', onActivity);
+menuZone.addEventListener('mouseleave', showUI);
+
 
 // Menu button handlers
 document.querySelectorAll('.menu-btn[data-mode]').forEach(btn => {
