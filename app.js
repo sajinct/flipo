@@ -168,23 +168,59 @@ function playAlarm() {
   if (!loadSettings().sound) return;
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const notes = [880, 0, 880, 0, 880]; // A5, pause, A5, pause, A5
-    const noteLen = 0.15;
-    const gap = 0.1;
-    notes.forEach((freq, i) => {
-      if (freq === 0) return;
+
+    // Kitchen timer style: 3 groups of double-beeps with pauses
+    // Pattern: beep-beep ... beep-beep ... beep-beep
+    const pattern = [
+      // Group 1
+      { freq: 1760, start: 0,    dur: 0.12 },
+      { freq: 1760, start: 0.18, dur: 0.12 },
+      // Group 2
+      { freq: 1760, start: 0.6,  dur: 0.12 },
+      { freq: 1760, start: 0.78, dur: 0.12 },
+      // Group 3
+      { freq: 1760, start: 1.2,  dur: 0.12 },
+      { freq: 1760, start: 1.38, dur: 0.12 },
+      // Final long tone
+      { freq: 2093, start: 1.8,  dur: 0.5 },
+    ];
+
+    pattern.forEach(({ freq, start, dur }) => {
+      const t = ctx.currentTime + start;
+
+      // Primary oscillator (square wave for piercing alarm tone)
       const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
+      osc.type = 'square';
       osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      const start = ctx.currentTime + i * (noteLen + gap);
-      gain.gain.setValueAtTime(0.3, start);
-      gain.gain.exponentialRampToValueAtTime(0.01, start + noteLen);
+
+      // Second oscillator slightly detuned for richness
+      const osc2 = ctx.createOscillator();
+      osc2.type = 'sine';
+      osc2.frequency.value = freq * 1.002;
+
+      // Gain envelope — sharp attack, sustain, quick release
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.45, t + 0.008);
+      gain.gain.setValueAtTime(0.45, t + dur - 0.03);
+      gain.gain.linearRampToValueAtTime(0, t + dur);
+
+      // Softer gain for the detuned layer
+      const gain2 = ctx.createGain();
+      gain2.gain.setValueAtTime(0, t);
+      gain2.gain.linearRampToValueAtTime(0.15, t + 0.008);
+      gain2.gain.setValueAtTime(0.15, t + dur - 0.03);
+      gain2.gain.linearRampToValueAtTime(0, t + dur);
+
       osc.connect(gain);
+      osc2.connect(gain2);
       gain.connect(ctx.destination);
-      osc.start(start);
-      osc.stop(start + noteLen);
+      gain2.connect(ctx.destination);
+
+      osc.start(t);
+      osc.stop(t + dur);
+      osc2.start(t);
+      osc2.stop(t + dur);
     });
   } catch {}
 }
