@@ -141,7 +141,7 @@ setInterval(() => {
 }, 30000);
 
 // === Storage ===
-const DEFAULTS = { focus: 25, short: 5, long: 15 };
+const DEFAULTS = { focus: 25, short: 5, long: 15, sound: true };
 
 function loadSettings() {
   try {
@@ -161,6 +161,32 @@ function loadSessions() {
 
 function saveSessions(s) {
   localStorage.setItem('pomo-sessions', JSON.stringify(s));
+}
+
+// === Timer alarm sound (Web Audio API) ===
+function playAlarm() {
+  if (!loadSettings().sound) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [880, 0, 880, 0, 880]; // A5, pause, A5, pause, A5
+    const noteLen = 0.15;
+    const gap = 0.1;
+    notes.forEach((freq, i) => {
+      if (freq === 0) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      const start = ctx.currentTime + i * (noteLen + gap);
+      gain.gain.setValueAtTime(0.3, start);
+      gain.gain.exponentialRampToValueAtTime(0.01, start + noteLen);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + noteLen);
+    });
+  } catch {}
 }
 
 function logSession(type, durationMin, task) {
@@ -320,6 +346,7 @@ function timerTick() {
     document.getElementById('t-minutes').classList.add('finished');
     document.getElementById('t-seconds').classList.add('finished');
     document.title = 'Done! - Flipo';
+    playAlarm();
     logSession(timerType, timerStartedDuration, currentTask);
     return;
   }
@@ -481,6 +508,9 @@ function showSettings() {
   document.getElementById('focus-duration').textContent = settings.focus;
   document.getElementById('short-duration').textContent = settings.short;
   document.getElementById('long-duration').textContent = settings.long;
+  const soundBtn = document.getElementById('sound-toggle');
+  soundBtn.textContent = settings.sound ? 'On' : 'Off';
+  soundBtn.classList.toggle('active', settings.sound);
   document.getElementById('settings-overlay').classList.remove('hidden');
 }
 
@@ -494,11 +524,19 @@ document.querySelectorAll('.stepper-btn').forEach(btn => {
   });
 });
 
+document.getElementById('sound-toggle').addEventListener('click', () => {
+  const btn = document.getElementById('sound-toggle');
+  const isOn = btn.textContent === 'On';
+  btn.textContent = isOn ? 'Off' : 'On';
+  btn.classList.toggle('active', !isOn);
+});
+
 document.getElementById('settings-save').addEventListener('click', () => {
   const settings = {
     focus: Number(document.getElementById('focus-duration').textContent),
     short: Number(document.getElementById('short-duration').textContent),
-    long: Number(document.getElementById('long-duration').textContent)
+    long: Number(document.getElementById('long-duration').textContent),
+    sound: document.getElementById('sound-toggle').textContent === 'On'
   };
   saveSettings(settings);
   document.getElementById('settings-overlay').classList.add('hidden');
