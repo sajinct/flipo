@@ -164,10 +164,27 @@ function saveSessions(s) {
 }
 
 // === Timer alarm sound (Web Audio API) ===
+// Create AudioContext on first user gesture so iOS Safari allows it later
+let audioCtx = null;
+
+function ensureAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+// Warm up audio on user interaction (iOS requires gesture)
+document.addEventListener('touchstart', ensureAudioCtx, { once: true });
+document.addEventListener('click', ensureAudioCtx, { once: true });
+
 function playAlarm() {
   if (!loadSettings().sound) return;
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = ensureAudioCtx();
 
     // Kitchen timer style: 3 groups of double-beeps with pauses
     // Pattern: beep-beep ... beep-beep ... beep-beep
