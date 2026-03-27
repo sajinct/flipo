@@ -13,35 +13,56 @@ async function requestWakeLock() {
 }
 
 // iOS fallback: silent video keeps screen awake
+let noSleepVideo = null;
+
 function initNoSleep() {
   const video = document.createElement('video');
-  video.setAttribute('playsinline', '');
-  video.setAttribute('muted', '');
-  video.setAttribute('loop', '');
-  video.style.position = 'fixed';
-  video.style.opacity = '0';
-  video.style.width = '1px';
-  video.style.height = '1px';
-  video.style.pointerEvents = 'none';
-  // Tiny inline base64 MP4 (silent, 1x1px, 1 second loop)
-  video.src = 'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAu1tZGF0AAACrQYF//+p3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE1MiByMjg1NCBlOWE1OTAzIC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAxNyAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTMgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4eDhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTMgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhPTAgYmZyYW1lcz0zIGJfcHlyYW1pZD0yIGJfYWRhcHQ9MSBiX2JpYXM9MCBkaXJlY3Q9MSB3ZWlnaHRiPTEgb3Blbl9nb3A9MCB3ZWlnaHRwPTIga2V5aW50PTI1MCBrZXlpbnRfbWluPTI1IHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAbWWIhAAz//727L4FNf2f0teleS2mvZiGBCnBkOhIl4iCAAADAADbBYIOBSAnMAABeAAFhISEAAAAA0BAAAAMA8YAAAaUBAAYogAAAAAUQ0MYAAANAMAAADAAADAA1MBGkAAAANkQAAAA==';
+  video.playsInline = true;
+  video.muted = true;
+  video.loop = true;
+  video.style.cssText = 'position:fixed;opacity:0;width:1px;height:1px;pointer-events:none;';
+
+  // Minimal silent MP4 — WebM fallback for broader compat
+  const mp4 = 'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAu1tZGF0AAACrQYF//+p3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE1MiByMjg1NCBlOWE1OTAzIC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAxNyAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTMgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4eDhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTMgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhPTAgYmZyYW1lcz0zIGJfcHlyYW1pZD0yIGJfYWRhcHQ9MSBiX2JpYXM9MCBkaXJlY3Q9MSB3ZWlnaHRiPTEgb3Blbl9nb3A9MCB3ZWlnaHRwPTIga2V5aW50PTI1MCBrZXlpbnRfbWluPTI1IHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAbWWIhAAz//727L4FNf2f0teleS2mvZiGBCnBkOhIl4iCAAADAADbBYIOBSAnMAABeAAFhISEAAAAA0BAAAAMA8YAAAaUBAAYogAAAAAUQ0MYAAANAMAAADAAADAA1MBGkAAAANkQAAAA==';
+  video.src = mp4;
   document.body.appendChild(video);
+  noSleepVideo = video;
+}
 
-  function playVideo() {
-    video.play().catch(() => {});
+function playNoSleep() {
+  if (!noSleepVideo) return;
+  // Re-assert muted (iOS can lose it across visibility changes)
+  noSleepVideo.muted = true;
+  if (noSleepVideo.paused) {
+    noSleepVideo.play().catch(() => {});
   }
-
-  // iOS requires user gesture to start video
-  document.addEventListener('click', playVideo, { once: true });
-  document.addEventListener('touchstart', playVideo, { once: true });
-  playVideo();
 }
 
 requestWakeLock();
 initNoSleep();
+
+// Retry video on every user interaction (iOS needs gesture)
+function onUserGesture() {
+  playNoSleep();
+  requestWakeLock();
+}
+document.addEventListener('click', onUserGesture);
+document.addEventListener('touchstart', onUserGesture);
+
+// Re-acquire both wake methods when app comes back to foreground
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') requestWakeLock();
+  if (document.visibilityState === 'visible') {
+    requestWakeLock();
+    playNoSleep();
+  }
 });
+
+// Safety net: periodically check and restart video if it stopped
+setInterval(() => {
+  if (noSleepVideo && noSleepVideo.paused) {
+    noSleepVideo.play().catch(() => {});
+  }
+}, 30000);
 
 // === Storage ===
 const DEFAULTS = { focus: 25, short: 5, long: 15 };
