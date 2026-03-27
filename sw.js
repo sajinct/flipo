@@ -27,7 +27,30 @@ self.addEventListener('activate', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
-  );
+  // Network-first for navigation and app assets (HTML, CSS, JS)
+  // Cache-first only for icons/images (rarely change)
+  const url = new URL(e.request.url);
+  const isAppAsset = e.request.mode === 'navigate'
+    || url.pathname.endsWith('.html')
+    || url.pathname.endsWith('.css')
+    || url.pathname.endsWith('.js')
+    || url.pathname.endsWith('.json');
+
+  if (isAppAsset) {
+    // Network first — always get latest, fall back to cache offline
+    e.respondWith(
+      fetch(e.request)
+        .then(response => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(e.request))
+    );
+  } else {
+    // Cache first for images/icons
+    e.respondWith(
+      caches.match(e.request).then(cached => cached || fetch(e.request))
+    );
+  }
 });

@@ -131,6 +131,7 @@
         <button class="btn btn-primary" id="settings-save">Done</button>
       </div>
       <div class="settings-version" id="settings-version"></div>
+      <button class="btn btn-ghost btn-update" id="check-update-btn" onclick="checkForUpdate()">Check for updates</button>
     </div>
   </div>
 
@@ -150,10 +151,5 @@
   </div>
 
   <script src="app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
-    }
-  </script>
 </body>
 </html>

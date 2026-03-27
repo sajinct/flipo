@@ -1,5 +1,35 @@
 const APP_VERSION = '1.2.0';
 
+// === Service Worker registration ===
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+
+function checkForUpdate() {
+  const btn = document.getElementById('check-update-btn');
+  if (!('serviceWorker' in navigator)) {
+    btn.textContent = 'Not supported';
+    return;
+  }
+  btn.textContent = 'Checking...';
+  btn.disabled = true;
+  navigator.serviceWorker.getRegistration().then(reg => {
+    if (!reg) { btn.textContent = 'No SW found'; return; }
+    reg.update().then(() => {
+      if (reg.waiting || reg.installing) {
+        btn.textContent = 'Updating...';
+        window.location.reload();
+      } else {
+        btn.textContent = 'Up to date';
+        setTimeout(() => {
+          btn.textContent = 'Check for updates';
+          btn.disabled = false;
+        }, 2000);
+      }
+    });
+  });
+}
+
 // === Idle UI: hide cursor + menu after 3s of inactivity ===
 let idleTimer = null;
 
