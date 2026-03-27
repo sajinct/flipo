@@ -1,5 +1,24 @@
 const APP_VERSION = '1.1.0';
 
+// === Idle UI: hide cursor + menu after 3s of inactivity ===
+let idleTimer = null;
+
+function onActivity() {
+  document.body.classList.remove('idle');
+  document.body.classList.add('menu-visible');
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    document.body.classList.add('idle');
+    document.body.classList.remove('menu-visible');
+  }, 3000);
+}
+
+document.addEventListener('mousemove', onActivity);
+document.addEventListener('mousedown', onActivity);
+document.addEventListener('touchstart', onActivity);
+document.addEventListener('click', onActivity);
+onActivity();
+
 // === Wake Lock (prevent screen sleep) ===
 let wakeLock = null;
 
@@ -519,28 +538,14 @@ document.querySelectorAll('.overlay').forEach(overlay => {
 
 // === Menu ===
 const menuZone = document.querySelector('.menu-zone');
-const menuToggle = document.getElementById('menu-toggle');
 
-// Desktop: hover
+// Keep UI active while hovering over menu
 menuZone.addEventListener('mouseenter', () => {
+  clearTimeout(idleTimer);
+  document.body.classList.remove('idle');
   document.body.classList.add('menu-visible');
 });
-
-menuZone.addEventListener('mouseleave', () => {
-  document.body.classList.remove('menu-visible');
-});
-
-// Mobile: tap toggle button to show, tap outside to hide
-menuToggle.addEventListener('click', (e) => {
-  e.stopPropagation();
-  document.body.classList.toggle('menu-visible');
-});
-
-document.addEventListener('click', (e) => {
-  if (!menuZone.contains(e.target) && e.target !== menuToggle) {
-    document.body.classList.remove('menu-visible');
-  }
-});
+menuZone.addEventListener('mouseleave', onActivity);
 
 // Menu button handlers
 document.querySelectorAll('.menu-btn[data-mode]').forEach(btn => {
