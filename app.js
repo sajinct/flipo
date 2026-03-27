@@ -1,4 +1,4 @@
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 
 // === Idle UI: hide cursor + menu after 3s of inactivity ===
 let idleTimer = null;
