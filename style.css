@@ -479,6 +479,13 @@ body.menu-visible .menu {
   cursor: default;
 }
 
+@media (max-height: 500px), (max-width: 600px) {
+  .overlay {
+    align-items: flex-start;
+    padding-top: 10vh;
+  }
+}
+
 .overlay.hidden {
   display: none;
 }

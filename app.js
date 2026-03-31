@@ -534,6 +534,17 @@ function showTaskModal(type, duration) {
   overlay.dataset.duration = duration;
 }
 
+// Keep task modal visible when mobile keyboard opens
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const overlay = document.getElementById('task-overlay');
+    if (!overlay.classList.contains('hidden')) {
+      const modal = overlay.querySelector('.modal');
+      modal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+}
+
 document.getElementById('task-start').addEventListener('click', () => {
   const overlay = document.getElementById('task-overlay');
   const task = document.getElementById('task-input').value.trim();
