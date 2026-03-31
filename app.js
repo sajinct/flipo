@@ -525,8 +525,9 @@ function showTaskModal(type, duration) {
   const overlay = document.getElementById('task-overlay');
   const input = document.getElementById('task-input');
   overlay.classList.remove('hidden');
-  input.value = '';
+  input.value = localStorage.getItem('pomo-last-task') || '';
   input.focus();
+  input.select();
 
   // Store pending info
   overlay.dataset.type = type;
@@ -536,6 +537,7 @@ function showTaskModal(type, duration) {
 document.getElementById('task-start').addEventListener('click', () => {
   const overlay = document.getElementById('task-overlay');
   const task = document.getElementById('task-input').value.trim();
+  if (task) localStorage.setItem('pomo-last-task', task);
   overlay.classList.add('hidden');
   beginTimer(overlay.dataset.type, Number(overlay.dataset.duration), task);
 });
