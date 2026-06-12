@@ -4,6 +4,13 @@
   box-sizing: border-box;
 }
 
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
 /* Hide cursor when idle — !important overrides cursor:pointer on buttons */
 body.idle, body.idle * {
   cursor: none !important;
@@ -30,6 +37,7 @@ body {
   position: fixed;
   bottom: 0;
   left: 0;
+  right: 0;
   width: 100%;
   height: 60px;
   z-index: 100;
@@ -44,7 +52,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
+  padding: 12px calc(24px + var(--safe-right)) calc(12px + var(--safe-bottom)) calc(24px + var(--safe-left));
   background: rgba(30, 30, 30, 0.95);
   border-radius: 16px 16px 0 0;
   backdrop-filter: blur(12px);
@@ -148,7 +156,7 @@ body.menu-visible .menu {
 
   .menu {
     flex-wrap: wrap;
-    padding: 14px 12px 18px;
+    padding: 14px calc(12px + var(--safe-right)) calc(18px + var(--safe-bottom)) calc(12px + var(--safe-left));
     gap: 0;
     justify-content: center;
   }
@@ -180,7 +188,7 @@ body.menu-visible .menu {
   }
 
   .menu {
-    padding: 6px 12px;
+    padding: 6px calc(12px + var(--safe-right)) calc(6px + var(--safe-bottom)) calc(12px + var(--safe-left));
     gap: 4px;
     justify-content: center;
   }
@@ -240,7 +248,7 @@ body.menu-visible .menu {
 /* === VIEWS === */
 .mode-view {
   position: fixed;
-  inset: 0;
+  inset: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
 }
 
 .mode-view.hidden {

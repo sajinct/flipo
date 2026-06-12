@@ -1,4 +1,4 @@
-const APP_VERSION = '1.2.1';
+const APP_VERSION = '1.2.2';
 
 // === Service Worker registration ===
 if ('serviceWorker' in navigator) {
@@ -295,20 +295,33 @@ function pad(n) {
   return String(n).padStart(2, '0');
 }
 
+function cssPxVar(name) {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name);
+  const value = Number.parseFloat(raw);
+  return Number.isFinite(value) ? value : 0;
+}
+
 function sizeDigits() {
   const ratio = 3 / 4; // card width:height
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
+  const viewport = window.visualViewport;
+  const vw = viewport ? viewport.width : window.innerWidth;
+  const vh = viewport ? viewport.height : window.innerHeight;
+  const safeTop = cssPxVar('--safe-top');
+  const safeBottom = cssPxVar('--safe-bottom');
+  const safeLeft = cssPxVar('--safe-left');
+  const safeRight = cssPxVar('--safe-right');
+  const usableW = Math.max(0, vw - safeLeft - safeRight);
+  const usableH = Math.max(0, vh - safeTop - safeBottom);
   const portrait = vh > vw;
 
   let cardW, cardH;
 
   if (portrait) {
     // Stacked vertically — 2 cards top/bottom
-    const pad = { x: vw * 0.03, y: vh * 0.02 };
-    const gap = Math.min(vh * 0.015, 24);
-    const availW = vw - pad.x * 2;
-    const availH = vh - pad.y * 2 - gap;
+    const pad = { x: usableW * 0.03, y: usableH * 0.02 };
+    const gap = Math.min(usableH * 0.015, 24);
+    const availW = usableW - pad.x * 2;
+    const availH = usableH - pad.y * 2 - gap;
 
     cardH = availH / 2;
     cardW = cardH * ratio;
@@ -320,10 +333,10 @@ function sizeDigits() {
     }
   } else {
     // Side by side — 2 cards left/right
-    const pad = { x: vw * 0.03, y: vh * 0.02 };
-    const gap = Math.min(vw * 0.015, 24);
-    const availW = vw - pad.x * 2 - gap;
-    const availH = vh - pad.y * 2;
+    const pad = { x: usableW * 0.03, y: usableH * 0.02 };
+    const gap = Math.min(usableW * 0.015, 24);
+    const availW = usableW - pad.x * 2 - gap;
+    const availH = usableH - pad.y * 2;
 
     cardW = availW / 2;
     cardH = cardW / ratio;
