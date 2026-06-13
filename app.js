@@ -1,4 +1,4 @@
-const APP_VERSION = '1.2.3';
+const APP_VERSION = '1.2.0';
 
 // === Service Worker registration ===
 if ('serviceWorker' in navigator) {
@@ -297,27 +297,18 @@ function pad(n) {
 
 function sizeDigits() {
   const ratio = 3 / 4; // card width:height
-
-  // Measure the visible card container directly. Its box already reflects the
-  // safe-area insets applied by CSS (.mode-view inset). Recomputing
-  // viewport-minus-env() in JS is unreliable — getComputedStyle returns the
-  // unresolved env() token stream for custom props, not a pixel length.
-  const view = document.querySelector('.mode-view:not(.hidden)');
-  const viewport = window.visualViewport;
-  const fallbackW = viewport ? viewport.width : window.innerWidth;
-  const fallbackH = viewport ? viewport.height : window.innerHeight;
-  const usableW = view && view.clientWidth ? view.clientWidth : fallbackW;
-  const usableH = view && view.clientHeight ? view.clientHeight : fallbackH;
-  const portrait = usableH > usableW;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const portrait = vh > vw;
 
   let cardW, cardH;
 
   if (portrait) {
     // Stacked vertically — 2 cards top/bottom
-    const pad = { x: usableW * 0.03, y: usableH * 0.02 };
-    const gap = Math.min(usableH * 0.015, 24);
-    const availW = usableW - pad.x * 2;
-    const availH = usableH - pad.y * 2 - gap;
+    const pad = { x: vw * 0.03, y: vh * 0.02 };
+    const gap = Math.min(vh * 0.015, 24);
+    const availW = vw - pad.x * 2;
+    const availH = vh - pad.y * 2 - gap;
 
     cardH = availH / 2;
     cardW = cardH * ratio;
@@ -329,10 +320,10 @@ function sizeDigits() {
     }
   } else {
     // Side by side — 2 cards left/right
-    const pad = { x: usableW * 0.03, y: usableH * 0.02 };
-    const gap = Math.min(usableW * 0.015, 24);
-    const availW = usableW - pad.x * 2 - gap;
-    const availH = usableH - pad.y * 2;
+    const pad = { x: vw * 0.03, y: vh * 0.02 };
+    const gap = Math.min(vw * 0.015, 24);
+    const availW = vw - pad.x * 2 - gap;
+    const availH = vh - pad.y * 2;
 
     cardW = availW / 2;
     cardH = cardW / ratio;
