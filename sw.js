@@ -1,4 +1,4 @@
-const CACHE_NAME = 'flipo-v1.2.1';
+const CACHE_NAME = 'flipo-v1.2.4';
 const ASSETS = [
   './',
   './index.html',

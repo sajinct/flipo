@@ -1,4 +1,4 @@
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.2.4';
 
 // === Service Worker registration ===
 if ('serviceWorker' in navigator) {
