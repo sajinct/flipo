@@ -1,4 +1,4 @@
-const APP_VERSION = '1.2.2';
+const APP_VERSION = '1.2.3';
 
 // === Service Worker registration ===
 if ('serviceWorker' in navigator) {
@@ -295,24 +295,20 @@ function pad(n) {
   return String(n).padStart(2, '0');
 }
 
-function cssPxVar(name) {
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(name);
-  const value = Number.parseFloat(raw);
-  return Number.isFinite(value) ? value : 0;
-}
-
 function sizeDigits() {
   const ratio = 3 / 4; // card width:height
+
+  // Measure the visible card container directly. Its box already reflects the
+  // safe-area insets applied by CSS (.mode-view inset). Recomputing
+  // viewport-minus-env() in JS is unreliable — getComputedStyle returns the
+  // unresolved env() token stream for custom props, not a pixel length.
+  const view = document.querySelector('.mode-view:not(.hidden)');
   const viewport = window.visualViewport;
-  const vw = viewport ? viewport.width : window.innerWidth;
-  const vh = viewport ? viewport.height : window.innerHeight;
-  const safeTop = cssPxVar('--safe-top');
-  const safeBottom = cssPxVar('--safe-bottom');
-  const safeLeft = cssPxVar('--safe-left');
-  const safeRight = cssPxVar('--safe-right');
-  const usableW = Math.max(0, vw - safeLeft - safeRight);
-  const usableH = Math.max(0, vh - safeTop - safeBottom);
-  const portrait = vh > vw;
+  const fallbackW = viewport ? viewport.width : window.innerWidth;
+  const fallbackH = viewport ? viewport.height : window.innerHeight;
+  const usableW = view && view.clientWidth ? view.clientWidth : fallbackW;
+  const usableH = view && view.clientHeight ? view.clientHeight : fallbackH;
+  const portrait = usableH > usableW;
 
   let cardW, cardH;
 
