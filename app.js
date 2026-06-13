@@ -1,4 +1,4 @@
-const APP_VERSION = '1.2.4';
+const APP_VERSION = '1.2.5';
 
 // === Service Worker registration ===
 if ('serviceWorker' in navigator) {
@@ -297,8 +297,13 @@ function pad(n) {
 
 function sizeDigits() {
   const ratio = 3 / 4; // card width:height
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
+
+  // Size against the visible card container, not the raw viewport. Its box is
+  // already inset by the safe areas (.mode-view inset), so the cards stay
+  // clear of the status bar / notch / home indicator.
+  const view = document.querySelector('.mode-view:not(.hidden)');
+  const vw = view?.clientWidth || window.innerWidth;
+  const vh = view?.clientHeight || window.innerHeight;
   const portrait = vh > vw;
 
   let cardW, cardH;

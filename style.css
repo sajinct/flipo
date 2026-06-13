@@ -43,7 +43,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
+  padding: 12px calc(24px + env(safe-area-inset-right, 0px))
+           calc(12px + env(safe-area-inset-bottom, 0px))
+           calc(24px + env(safe-area-inset-left, 0px));
   background: rgba(30, 30, 30, 0.95);
   border-radius: 16px 16px 0 0;
   backdrop-filter: blur(12px);
@@ -147,7 +149,9 @@ body.menu-visible .menu {
 
   .menu {
     flex-wrap: wrap;
-    padding: 14px 12px 18px;
+    padding: 14px calc(12px + env(safe-area-inset-right, 0px))
+             calc(18px + env(safe-area-inset-bottom, 0px))
+             calc(12px + env(safe-area-inset-left, 0px));
     gap: 0;
     justify-content: center;
   }
@@ -179,7 +183,9 @@ body.menu-visible .menu {
   }
 
   .menu {
-    padding: 6px 12px;
+    padding: 6px calc(12px + env(safe-area-inset-right, 0px))
+             calc(6px + env(safe-area-inset-bottom, 0px))
+             calc(12px + env(safe-area-inset-left, 0px));
     gap: 4px;
     justify-content: center;
   }
@@ -238,8 +244,9 @@ body.menu-visible .menu {
 
 /* === VIEWS === */
 .mode-view {
-  position: absolute;
-  inset: 0;
+  position: fixed;
+  inset: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+         env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
 }
 
 .mode-view.hidden {
